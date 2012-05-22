@@ -4,6 +4,9 @@
 
 #pragma comment(lib, "fwpuclnt.lib")
 
+#include <iostream>
+HANDLE engineHandle = 0;
+
 #define EXIT_ON_ERROR(fnName) \
 	if (result != ERROR_SUCCESS) \
    { \
@@ -16,6 +19,9 @@ void CALLBACK FilterChangeCallback(IN void* context,
 {
 	PCSTR changeType;
 	wchar_t guidString[sizeof("{eaea82e6-6747-4321-ab51-44ba5509b812}")];
+	
+	FWPM_FILTER * filterObject;
+	FwpmFilterGetByKey(engineHandle, &(change->filterKey), &filterObject);
 
 	switch (change->changeType)
 	{
@@ -39,11 +45,24 @@ void CALLBACK FilterChangeCallback(IN void* context,
 
 	printf(
 		"   changeType = %s\n"
-		"   filterId = %I64u\n"
-		"\n",
+		"   filterId = %I64u\n",
 		changeType,
 		change->filterId
 		);
+
+	if (filterObject != NULL)
+	{
+		wprintf(
+			L"   filterName = %s\n"
+			L"   filterDesc = %s\n"
+			L"\n",
+			filterObject->displayData.name,
+			filterObject->displayData.description);
+	}
+	else
+	{
+		printf("No filter object\n\n");
+	}
 }
 
 DWORD InitFilterConditions(
@@ -124,9 +143,6 @@ CLEANUP:
 	return result;
 }
 
-
-
-#include <iostream>
 DWORD wmain(int argc,
 	wchar_t* argv[])
 {
@@ -134,7 +150,7 @@ DWORD wmain(int argc,
 	UNREFERENCED_PARAMETER(argv);
 
 	// Open a session to the filter engine
-	HANDLE engineHandle = 0;
+
 
 	// Use dynamic sessions for efficiency and safety:
 	//  - All objects associated with the dynamic session are deleted with one call.
