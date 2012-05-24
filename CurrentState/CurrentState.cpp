@@ -98,7 +98,7 @@ CLEANUP:
 	}
 	else
 	{
-		for (int i = 0; i < numFilters; i++)
+		for (unsigned int i = 0; i < numFilters; i++)
 		{
 			printf("\n%d. %ws", i + 1, (filters[i])->displayData.name);
 		}
