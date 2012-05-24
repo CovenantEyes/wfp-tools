@@ -1,3 +1,13 @@
-*.opensdf
+*.exe
+*.idb
+*.ilk
 *.log
+*.obj
+*.opensdf
+*.pdb
+*.suo
 *.tlog
+*.user
+Debug/
+Release/
+ipch/

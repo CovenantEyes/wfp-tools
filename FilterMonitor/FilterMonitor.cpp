@@ -14,6 +14,60 @@ HANDLE engineHandle = 0;
    goto CLEANUP; \
    }
 
+
+void CALLBACK CalloutChangeCallback(IN void* context,
+	IN const FWPM_CALLOUT_CHANGE0* change)
+{
+	PCSTR changeType;
+	wchar_t guidString[sizeof("{eaea82e6-6747-4321-ab51-44ba5509b812}")];
+
+	FWPM_CALLOUT * calloutObject;
+	FwpmCalloutGetByKey(engineHandle, &(change->calloutKey), &calloutObject);
+
+	switch (change->changeType)
+	{
+	case FWPM_CHANGE_ADD:
+		{
+			changeType = "FWPM_CHANGE_ADD";
+			break;
+		}
+	case FWPM_CHANGE_DELETE:
+		{
+			changeType = "FWPM_CHANGE_DELETE";
+			break;
+		}
+
+	default:
+		{
+			changeType = "<unknown>";
+			break;
+		}
+	}
+
+	printf(
+		"Callout Change"
+		"   changeType = %s\n"
+		"   filterId = %I64u\n",
+		changeType,
+		change->calloutId
+		);
+
+	if (calloutObject != NULL)
+	{
+		wprintf(
+			L"   filterName = %s\n"
+			L"   filterDesc = %s\n"
+			L"\n",
+			calloutObject->displayData.name,
+			calloutObject->displayData.description);
+	}
+	else
+	{
+		printf("No callout object\n\n");
+	}
+}
+
+
 void CALLBACK FilterChangeCallback(IN void* context,
 	IN const FWPM_FILTER_CHANGE0* change)
 {
@@ -44,6 +98,7 @@ void CALLBACK FilterChangeCallback(IN void* context,
 	}
 
 	printf(
+		"Filter Change"
 		"   changeType = %s\n"
 		"   filterId = %I64u\n",
 		changeType,
@@ -79,6 +134,63 @@ DWORD InitFilterConditions(
 	*numCondsOut = 0;
 	return 0;
 }
+
+DWORD MonitorMatchingCallouts(
+	__in HANDLE engine,
+	__in const GUID* layerKey,
+	__in_opt PCWSTR appPath,
+	__in_opt const SOCKADDR* localAddr,
+	__in_opt UINT8 ipProtocol,
+	__in FWPM_CALLOUT_CHANGE_CALLBACK0 callback,
+	__in_opt void* context,
+	__out HANDLE* changeHandle
+	)
+{
+	DWORD result = ERROR_SUCCESS;
+	FWPM_FILTER_CONDITION0 conds[4];
+	UINT32 numConds;
+	FWP_BYTE_BLOB* appBlob = NULL;
+	FWPM_CALLOUT_ENUM_TEMPLATE enumTempl;
+	FWPM_CALLOUT_SUBSCRIPTION sub;
+
+	// InitFilterConditions is presented in the 
+	// Populating Filter Conditions example code 
+	result = InitFilterConditions(
+		appPath,
+		localAddr,
+		ipProtocol,
+		ARRAYSIZE(conds),
+		conds,
+		&numConds,
+		&appBlob
+		);
+	EXIT_ON_ERROR(InitFilterConditions);
+
+	memset(&enumTempl, 0, sizeof(enumTempl));
+	enumTempl.layerKey = *layerKey;
+
+	memset(&sub, 0, sizeof(sub));
+	sub.enumTemplate = &enumTempl;
+	// We want to see both adds and deletes.
+	sub.flags = ( FWPM_SUBSCRIPTION_FLAG_NOTIFY_ON_ADD |
+		FWPM_SUBSCRIPTION_FLAG_NOTIFY_ON_DELETE );
+
+	// Once we have successfully subscribed, our callback will be invoked for
+	// every matching add and delete until we call FwpmFilterUnsubscribeChanges0.
+	result = FwpmCalloutSubscribeChanges0(
+		engine,
+		&sub,
+		callback,
+		context,
+		changeHandle
+		);
+	EXIT_ON_ERROR(result);
+
+CLEANUP:
+	FwpmFreeMemory0((void**)&appBlob);
+	return result;
+}
+
 
 DWORD MonitorMatchingFilters(
 	__in HANDLE engine,
@@ -143,6 +255,7 @@ CLEANUP:
 	return result;
 }
 
+
 DWORD wmain(int argc,
 	wchar_t* argv[])
 {
@@ -162,17 +275,31 @@ DWORD wmain(int argc,
 	DWORD result = FwpmEngineOpen0(NULL, RPC_C_AUTHN_WINNT, NULL, &session, &engineHandle);
 	EXIT_ON_ERROR(FwpmEngineOpen0);      
 
-	HANDLE changeHandle = 0;
-	FWPM_FILTER_CHANGE_CALLBACK0 callback = (FWPM_FILTER_CHANGE_CALLBACK0)FilterChangeCallback;
+	HANDLE filterChangeHandle = 0;
+
+	FWPM_FILTER_CHANGE_CALLBACK0 filterCallback = (FWPM_FILTER_CHANGE_CALLBACK0)FilterChangeCallback;
 	result = MonitorMatchingFilters(
 		engineHandle,
 		&FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4,
 		0,
 		0,
 		0,
-		callback,
+		filterCallback,
 		0,
-		&changeHandle
+		&filterChangeHandle
+		);
+	
+	HANDLE calloutChangeHandle = 0;
+	FWPM_CALLOUT_CHANGE_CALLBACK0 calloutCallback = (FWPM_CALLOUT_CHANGE_CALLBACK0)CalloutChangeCallback;
+	result = MonitorMatchingCallouts(
+		engineHandle,
+		&FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4,
+		0,
+		0,
+		0,
+		calloutCallback,
+		0,
+		&calloutChangeHandle
 		);
 
 CLEANUP:  

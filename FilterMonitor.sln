@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FilterMonitor", "FilterMonitor\FilterMonitor.vcxproj", "{D8CBD13B-DCCF-4C6B-99CB-B0FFF4254FCC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CurrentState", "CurrentState\CurrentState.vcxproj", "{3D16D8CE-7150-46B2-9898-97204B6FB2FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{D8CBD13B-DCCF-4C6B-99CB-B0FFF4254FCC}.Debug|Win32.Build.0 = Debug|Win32
 		{D8CBD13B-DCCF-4C6B-99CB-B0FFF4254FCC}.Release|Win32.ActiveCfg = Release|Win32
 		{D8CBD13B-DCCF-4C6B-99CB-B0FFF4254FCC}.Release|Win32.Build.0 = Release|Win32
+		{3D16D8CE-7150-46B2-9898-97204B6FB2FB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3D16D8CE-7150-46B2-9898-97204B6FB2FB}.Debug|Win32.Build.0 = Debug|Win32
+		{3D16D8CE-7150-46B2-9898-97204B6FB2FB}.Release|Win32.ActiveCfg = Release|Win32
+		{3D16D8CE-7150-46B2-9898-97204B6FB2FB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
