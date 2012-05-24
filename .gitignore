@@ -1,10 +1,14 @@
 *.exe
 *.idb
 *.ilk
+*.ipch
+*.lastbuildstate
 *.log
+*.manifest
 *.obj
 *.opensdf
 *.pdb
+*.sdf
 *.suo
 *.tlog
 *.user
