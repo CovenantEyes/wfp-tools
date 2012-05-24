@@ -21,3 +21,8 @@ Both Microsoft's Windows SDK 7.0A and 7.1 (and perhaps other versions too) conta
 In several places, these headers have extraneous new-line characters in the middle of `#define` derectives. You
 will need to remove the extraneous whitespace manually where-ever the compiler complains about it. **Note that
 you will need administrator privileges to edit these files.**
+
+Running Compiled Programs
+-------------------------
+
+**After you've compiled these projects, you will need administrator privileges to run or debug them!**
