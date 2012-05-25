@@ -7,7 +7,7 @@ Tools to help understand Windows Filtering Platform craziness.
 Dependencies
 ============
 
-These projects builds with **Microsoft Visual Studio 2010** and uses Microsoft **Windows SDK 7.1**.
+These projects build with **Microsoft Visual Studio 2010** and use Microsoft **Windows SDK 7.1**.
 
 
 Building with Microsoft Windows SDK
