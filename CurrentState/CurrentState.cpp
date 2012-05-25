@@ -105,7 +105,7 @@ DWORD wmain(void)
 
 		if (result == ERROR_SUCCESS)
 		{
-			printf("\n%ws: %d filters", layers[i]->displayData.name, filterCount);
+			printf("\n\n%ws: %d filters", layers[i]->displayData.name, filterCount);
 
 			for (size_t j = 0; j < filterCount; j++)
 			{
@@ -117,11 +117,11 @@ DWORD wmain(void)
 			printf("\n\tError getting filters (error code 0x%08X)", result);
 		}
 
-		FwpmFreeMemory((void**)filters);
+		//FwpmFreeMemory((void**)filters);
 	}
 
 CLEANUP:
-	FwpmFreeMemory((void**)layers);
-	FwpmEngineClose(engineHandle); // This is automatically done when the program closes, but I want to be explicit.
+	//FwpmFreeMemory((void**)layers);
+	//FwpmEngineClose(engineHandle); // This is automatically done when the program closes, but I want to be explicit.
 	return result;
 }
